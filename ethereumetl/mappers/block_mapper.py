@@ -23,15 +23,21 @@
 
 from ethereumetl.domain.block import EthBlock
 from ethereumetl.mappers.transaction_mapper import EthTransactionMapper
+from ethereumetl.mappers.withdrawal_mapper import EthWithdrawalMapper
 from ethereumetl.utils import hex_to_dec, to_normalized_address
 
 
 class EthBlockMapper(object):
-    def __init__(self, transaction_mapper=None):
+    def __init__(self, transaction_mapper=None, withdrawal_mapper=None):
         if transaction_mapper is None:
             self.transaction_mapper = EthTransactionMapper()
         else:
             self.transaction_mapper = transaction_mapper
+
+        if withdrawal_mapper is None:
+            self.withdrawal_mapper = EthWithdrawalMapper()
+        else:
+            self.withdrawal_mapper = withdrawal_mapper
 
     def json_dict_to_block(self, json_dict):
         block = EthBlock()
@@ -62,6 +68,15 @@ class EthBlockMapper(object):
             ]
 
             block.transaction_count = len(json_dict['transactions'])
+
+        if 'withdrawals' in json_dict:
+            block.withdrawals = [
+                self.withdrawal_mapper.json_dict_to_withdrawal(withdrawal, block_timestamp=block.timestamp)
+                for withdrawal in json_dict['withdrawals']
+                if isinstance(withdrawal, dict)
+            ]
+
+            block.withdrawal_count = len(json_dict['withdrawals'])
 
         return block
 

@@ -63,15 +63,28 @@ TRANSACTION_FIELDS_TO_EXPORT = [
     'transaction_type'
 ]
 
+WITHDRAWAL_FIELDS_TO_EXPORT = [
+    'index',
+    'validator_index',
+    'address',
+    'amount'
+]
 
-def blocks_and_transactions_item_exporter(blocks_output=None, transactions_output=None):
+
+def blocks_and_transactions_item_exporter(
+        blocks_output=None,
+        transactions_output=None,
+        withdrawals_output=None,
+    ):
     return CompositeItemExporter(
         filename_mapping={
             'block': blocks_output,
-            'transaction': transactions_output
+            'transaction': transactions_output,
+            'withdrawal': withdrawals_output,
         },
         field_mapping={
             'block': BLOCK_FIELDS_TO_EXPORT,
-            'transaction': TRANSACTION_FIELDS_TO_EXPORT
+            'transaction': TRANSACTION_FIELDS_TO_EXPORT,
+            'withdrawal': WITHDRAWAL_FIELDS_TO_EXPORT
         }
     )
